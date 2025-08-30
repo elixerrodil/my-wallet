@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model budget_plans {
+  id                         Int       @id(map: "budget_plan_pkey") @default(autoincrement())
+  description                String?   @db.VarChar(255)
+  status                     Boolean?  @default(false)
+  user_id                    Int?
+  created_date               DateTime? @db.Timestamptz(6)
+  updated_date               DateTime? @db.Timestamptz(6)
+  currency                   String?   @db.VarChar
+  investment_percentage      Decimal?  @db.Decimal
+  savings_percentage         Decimal?  @db.Decimal
+  emergency_funds_percentage Decimal?  @db.Decimal
+  travel_funds_percentage    Decimal?  @db.Decimal
+  budget_date                DateTime? @db.Timestamptz(6)
+  expenses                   Json[]
+  incomes                    Json[]
+  remarks                    String?   @db.VarChar
+  users                      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_users")
+}
+
+model expenses {
+  id             Int       @id @default(autoincrement())
+  description    String?   @db.VarChar(200)
+  amount         Decimal?  @db.Decimal
+  frequency      Int?
+  user_id        Int?
+  created_date   DateTime? @db.Timestamptz(6)
+  currency       String?   @db.VarChar
+  updated_date   DateTime? @db.Timestamptz(6)
+  first_due_date DateTime? @db.Timestamptz(6)
+  users          users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model income_sources {
+  id           Int           @id @default(autoincrement())
+  income       Decimal?      @db.Decimal
+  frequency    Int?
+  user_id      Int?
+  created_date DateTime?     @db.Timestamptz(6)
+  description  String?       @db.VarChar
+  type_id      Int?
+  currency     String?       @db.VarChar
+  updated_date DateTime?     @db.Timestamptz(6)
+  income_types income_types? @relation(fields: [type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_income_types")
+  users        users?        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_users")
+}
+
+model income_types {
+  id             Int              @id @default(autoincrement())
+  description    String?          @db.VarChar
+  income_sources income_sources[]
+}
+
+model posts {
+  id        Int      @id(map: "Post_pkey") @default(autoincrement())
+  title     String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  content   String?
+  published Boolean  @default(false)
+  authorId  Int
+  users     users    @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Post_authorId_fkey")
+}
+
+model profiles {
+  id     Int     @id(map: "Profile_pkey") @default(autoincrement())
+  bio    String?
+  userId Int     @unique(map: "Profile_userId_key")
+  users  users   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Profile_userId_fkey")
+}
+
+model users {
+  id             Int              @id(map: "User_pkey") @default(autoincrement())
+  name           String?          @db.VarChar(255)
+  email          String           @unique(map: "User_email_key") @db.VarChar(255)
+  password       String?          @db.VarChar(255)
+  title          String?          @db.VarChar(255)
+  budget_plans   budget_plans[]
+  expenses       expenses[]
+  income_sources income_sources[]
+  posts          posts[]
+  profiles       profiles?
+}
