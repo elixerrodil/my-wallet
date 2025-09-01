@@ -1,5 +1,14 @@
-import { IncomeSources } from '@/types/sources';
+import { IncomeSources } from '@/types/source';
 import { PrismaClient } from '@prisma/client';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
 
 const Source = async () => {
   const prisma = new PrismaClient();
@@ -23,66 +32,44 @@ const Source = async () => {
   return (
     <>
       <div className='p-4'>
-        <h1 className='mb-4 text-2xl font-bold'>Income Sources</h1>
-        <table className='min-w-full border border-gray-300'>
-          <thead>
-            <tr className='bg-gray-200'>
-              <th className='border border-gray-300 px-4 py-2 text-left'>ID</th>
-              <th className='border border-gray-300 px-4 py-2 text-left'>
-                Description
-              </th>
-              <th className='border border-gray-300 px-4 py-2 text-left'>
-                Income
-              </th>
-              <th className='border border-gray-300 px-4 py-2 text-left'>
-                Frequency
-              </th>
-              <th className='border border-gray-300 px-4 py-2 text-left'>
-                Currency
-              </th>
-              <th className='border border-gray-300 px-4 py-2 text-left'>
-                Created Date
-              </th>
-              <th className='border border-gray-300 px-4 py-2 text-left'>
-                Updated Date
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableCaption>A List of income sources</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className='w-[100px]'>ID</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className='text-right'>Income / Amount</TableHead>
+              <TableHead>Currency</TableHead>
+              <TableHead>Frequency</TableHead>
+              <TableHead>Created Date</TableHead>
+              <TableHead>Updated Date</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {income_sources.map((source) => (
-              <tr
-                key={source.id}
-                className='hover:bg-gray-100'
-              >
-                <td className='border border-gray-300 px-4 py-2'>
-                  {source.id}
-                </td>
-                <td className='border border-gray-300 px-4 py-2'>
-                  {source.description || 'N/A'}
-                </td>
-                <td className='border border-gray-300 px-4 py-2'>
+              <TableRow key={source.id}>
+                <TableCell className='font-medium'>{source.id}</TableCell>
+                <TableCell>{source.description || 'N/A'}</TableCell>
+
+                <TableCell className='text-right'>
                   {source.income !== null ? source.income : 'N/A'}
-                </td>
-                <td className='border border-gray-300 px-4 py-2'>
-                  {source.frequency !== null ? source.frequency : 'N/A'}
-                </td>
-                <td className='border border-gray-300 px-4 py-2'>
-                  {source.currency || 'N/A'}
-                </td>
-                <td className='border border-gray-300 px-4 py-2'>
+                </TableCell>
+                <TableCell>{source.currency || 'N/A'}</TableCell>
+                <TableCell>{source.frequency || 'N/A'}</TableCell>
+                <TableCell>
                   {source.created_date
-                    ? new Date(source.created_date).toLocaleDateString()
+                    ? source.created_date.toLocaleDateString()
                     : 'N/A'}
-                </td>
-                <td className='border border-gray-300 px-4 py-2'>
+                </TableCell>
+                <TableCell>
                   {source.updated_date
-                    ? new Date(source.updated_date).toLocaleDateString()
+                    ? source.updated_date.toLocaleDateString()
                     : 'N/A'}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </>
   );
